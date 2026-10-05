@@ -961,6 +961,9 @@ struct Focus: View {
                 Defaults.Toggle(key: .pomodoroShowInNotch) {
                     Text("Show timer in the notch")
                 }
+                Defaults.Toggle(key: .pomodoroAlwaysInNotch) {
+                    Text("Keep it visible between sessions")
+                }
                 Defaults.Toggle(key: .pomodoroSoundEnabled) {
                     Text("Play a sound when a session ends")
                 }

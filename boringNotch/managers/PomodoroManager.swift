@@ -165,8 +165,13 @@ final class PomodoroManager: ObservableObject {
     /// user just moved to. So it also stays while parked on a break or once the
     /// current round has started. Picking Focus again while idle clears the round
     /// and hands the notch back to the music widget.
+    /// The music widget only claims the closed notch while it is playing, and the
+    /// Pomodoro used to do the same: idle, focused, no round banked and the band
+    /// went empty, so the remaining time was unreadable until a session started.
+    /// `pomodoroAlwaysInNotch` keeps it on screen between sessions too.
     var isRelevantToNotch: Bool {
-        state != .idle || mode != .focus || roundSessions > 0
+        guard !Defaults[.pomodoroAlwaysInNotch] else { return true }
+        return state != .idle || mode != .focus || roundSessions > 0
     }
 
     var progress: Double {

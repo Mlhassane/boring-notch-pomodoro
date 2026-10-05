@@ -79,6 +79,9 @@ extension Defaults.Keys {
     static let pomodoroSoundEnabled = Key<Bool>("pomodoroSoundEnabled", default: true)
     static let pomodoroNotifications = Key<Bool>("pomodoroNotifications", default: true)
     static let pomodoroShowInNotch = Key<Bool>("pomodoroShowInNotch", default: true)
+    /// When true the closed notch shows the timer even between sessions, so the
+    /// remaining time is always readable without starting anything first.
+    static let pomodoroAlwaysInNotch = Key<Bool>("pomodoroAlwaysInNotch", default: true)
 
     // MARK: General
     static let menubarIcon = Key<Bool>("menubarIcon", default: true)

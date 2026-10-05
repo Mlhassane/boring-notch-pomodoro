@@ -3,7 +3,7 @@
 //  boringNotch
 //
 //  Closed-notch widget: a ring, the remaining time and the round counter, in the
-//  band under the cutout. Shown whenever a session is running or paused.
+//  band under the cutout.
 //
 //  The music equivalent of this band is the album art plus `AudioSpectrumView`,
 //  whose bars move with the track. There is no audio here, so the ring carries
@@ -11,6 +11,11 @@
 //  breathes, both of them only while a session is running. Both stop dead on
 //  pause. Progress on its own is not enough — over a 25 minute session the arc
 //  creeps, and the first frames of a session have no arc at all.
+//
+//  Colours are neutral, not `mode.tint`. In the notch the timer sits between
+//  the album art and the spectrum, and a saturated ring there reads louder than
+//  the music it is supposed to sit quietly beside. The tint stays in the Focus
+//  tab, where it has room and no neighbours.
 //
 
 import SwiftUI
@@ -20,7 +25,8 @@ struct PomodoroLiveActivity: View {
     @ObservedObject var pomodoro = PomodoroManager.shared
     @State private var pulse = false
 
-    private var tint: Color { pomodoro.mode.tint }
+    /// Deliberately achromatic, see the note at the top of the file.
+    private let ringTint = Color.white
 
     var body: some View {
         HStack(spacing: 7) {
@@ -38,7 +44,7 @@ struct PomodoroLiveActivity: View {
                 Text("\(pomodoro.sessionsInRound)/\(pomodoro.sessionsPerRound)")
                     .font(.system(size: 9, weight: .medium))
                     .monospacedDigit()
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(.white.opacity(0.45))
             }
         }
         .frame(height: max(0, Defaults[.notchHeight] - 12))
@@ -78,12 +84,12 @@ struct PomodoroLiveActivity: View {
             // (`effectiveClosedNotchHeight - 12`), so both read at the same weight.
             size: 20,
             lineWidth: 3,
-            tint: tint,
+            tint: ringTint,
             sweep: pomodoro.isRunning,
             sweepAngle: angle
         )
         .scaleEffect(pulse ? 1.1 : 0.82)
-        .shadow(color: pulse ? tint.opacity(0.9) : .clear, radius: 5)
+        .shadow(color: pulse ? Color.white.opacity(0.55) : .clear, radius: 4)
     }
 
     /// A repeatForever animation only starts on a value change, so the flag has
