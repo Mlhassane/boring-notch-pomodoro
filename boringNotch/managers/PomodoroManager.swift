@@ -33,6 +33,11 @@ final class PomodoroManager: ObservableObject {
     /// Mirrors `WebcamManager.authorizationStatus`: surfaced in the settings UI so
     /// a denied permission is visible instead of silently swallowing alerts.
     @Published private(set) var notificationStatus: UNAuthorizationStatus = .notDetermined
+    /// Free-running counter, advanced by the 10 Hz ticker. The closed-notch ring
+    /// derives its sweep angle from it. It is deliberately *not* derived from
+    /// `remaining`: a 25 minute session moves the progress arc by 0.00007 per
+    /// tick, which reads as completely still.
+    @Published private(set) var sweepTick: UInt64 = 0
 
     private var deadline: Date?
     private var startedAt: Date?
@@ -250,6 +255,11 @@ final class PomodoroManager: ObservableObject {
 
     private func tick() {
         guard state == .running, let deadline else { return }
+        // The closed-notch ring sweeps off this. It rides the existing 10 Hz
+        // ticker because a `TimelineView(.animation)` would not run: AppKit
+        // throttles CADisplayLink for the non-activating panel the notch is
+        // drawn in, so its angle stayed frozen at zero.
+        sweepTick &+= 1
         let left = deadline.timeIntervalSinceNow
         if left <= 0 {
             remaining = 0
