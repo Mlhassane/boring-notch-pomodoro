@@ -260,16 +260,21 @@ final class PomodoroManager: ObservableObject {
     }
 
     private func complete() {
+        let finishedMode = mode
         state = .idle
         deadline = nil
         bankSession(completed: true)
 
         celebrationToken &+= 1
-        announceCompletion()
 
         let next = mode.isBreak ? PomodoroMode.focus : breakModeAfter(crediting: true)
         let shouldAutoStart = mode.isBreak ? Defaults[.pomodoroAutoStartFocus] : Defaults[.pomodoroAutoStartBreaks]
         transition(to: next, creditFocus: true, autoStart: shouldAutoStart)
+
+        // After the transition on purpose: `totalFocusSessions` is bumped inside
+        // transition(), so announcing before it always reported the tally as if
+        // this session had not happened yet.
+        announceCompletion(finishedMode: finishedMode)
     }
 
     private func breakModeAfter(crediting: Bool) -> PomodoroMode {
@@ -314,14 +319,14 @@ final class PomodoroManager: ObservableObject {
 
     // MARK: - Feedback
 
-    private func announceCompletion() {
+    private func announceCompletion(finishedMode: PomodoroMode) {
         if Defaults[.pomodoroSoundEnabled] {
-            NSSound(named: mode.isBreak ? "Glass" : "Bell")?.play()
+            NSSound(named: finishedMode.isBreak ? "Glass" : "Bell")?.play()
         }
         guard Defaults[.pomodoroNotifications] else { return }
 
         let content = UNMutableNotificationContent()
-        switch mode {
+        switch finishedMode {
         case .focus:
             content.title = "Session complete"
             content.body = "\(totalFocusSessions) done today. Time for a break."
