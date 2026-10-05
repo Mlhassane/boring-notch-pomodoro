@@ -69,6 +69,17 @@ enum OptionKeyAction: String, CaseIterable, Identifiable, Defaults.Serializable 
 }
 
 extension Defaults.Keys {
+    // MARK: Pomodoro
+    static let pomodoroFocusMinutes = Key<Int>("pomodoroFocusMinutes", default: 25)
+    static let pomodoroShortBreakMinutes = Key<Int>("pomodoroShortBreakMinutes", default: 5)
+    static let pomodoroLongBreakMinutes = Key<Int>("pomodoroLongBreakMinutes", default: 15)
+    static let pomodoroSessionsPerRound = Key<Int>("pomodoroSessionsPerRound", default: 4)
+    static let pomodoroAutoStartBreaks = Key<Bool>("pomodoroAutoStartBreaks", default: true)
+    static let pomodoroAutoStartFocus = Key<Bool>("pomodoroAutoStartFocus", default: true)
+    static let pomodoroSoundEnabled = Key<Bool>("pomodoroSoundEnabled", default: true)
+    static let pomodoroNotifications = Key<Bool>("pomodoroNotifications", default: true)
+    static let pomodoroShowInNotch = Key<Bool>("pomodoroShowInNotch", default: true)
+
     // MARK: General
     static let menubarIcon = Key<Bool>("menubarIcon", default: true)
     static let showOnAllDisplays = Key<Bool>("showOnAllDisplays", default: false)

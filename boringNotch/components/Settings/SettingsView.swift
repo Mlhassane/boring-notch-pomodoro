@@ -48,6 +48,9 @@ struct SettingsView: View {
 //                NavigationLink(value: "Downloads") {
 //                    Label("Downloads", systemImage: "square.and.arrow.down")
 //                }
+                NavigationLink(value: "Focus") {
+                    Label("Focus", systemImage: "timer")
+                }
                 NavigationLink(value: "Shelf") {
                     Label("Shelf", systemImage: "books.vertical")
                 }
@@ -83,6 +86,8 @@ struct SettingsView: View {
                     HUD()
                 case "Battery":
                     Charge()
+                case "Focus":
+                    Focus()
                 case "Shelf":
                     Shelf()
                 case "Shortcuts":
@@ -909,9 +914,89 @@ struct About: View {
     }
 }
 
+struct Focus: View {
+    @Default(.pomodoroFocusMinutes) var focusMinutes: Int
+    @Default(.pomodoroShortBreakMinutes) var shortBreakMinutes: Int
+    @Default(.pomodoroLongBreakMinutes) var longBreakMinutes: Int
+    @Default(.pomodoroSessionsPerRound) var sessionsPerRound: Int
+    @ObservedObject private var pomodoro = PomodoroManager.shared
+
+    var body: some View {
+        Form {
+            Section {
+                Stepper(value: $focusMinutes, in: 1...90, step: 1) {
+                    Text("Focus duration: \(focusMinutes) min")
+                }
+                Stepper(value: $shortBreakMinutes, in: 1...30, step: 1) {
+                    Text("Short break: \(shortBreakMinutes) min")
+                }
+                Stepper(value: $longBreakMinutes, in: 1...60, step: 1) {
+                    Text("Long break: \(longBreakMinutes) min")
+                }
+                Stepper(value: $sessionsPerRound, in: 2...8, step: 1) {
+                    Text("Sessions per round: \(sessionsPerRound)")
+                }
+            } header: {
+                HStack {
+                    Text("Durations")
+                }
+            } footer: {
+                Text("A long break replaces the short one every \(sessionsPerRound) sessions.")
+            }
+
+            Section {
+                Defaults.Toggle(key: .pomodoroAutoStartBreaks) {
+                    Text("Auto-start breaks")
+                }
+                Defaults.Toggle(key: .pomodoroAutoStartFocus) {
+                    Text("Auto-start focus sessions")
+                }
+            } header: {
+                HStack {
+                    Text("Behaviour")
+                }
+            }
+
+            Section {
+                Defaults.Toggle(key: .pomodoroShowInNotch) {
+                    Text("Show timer in the notch")
+                }
+                Defaults.Toggle(key: .pomodoroSoundEnabled) {
+                    Text("Play a sound when a session ends")
+                }
+                Defaults.Toggle(key: .pomodoroNotifications) {
+                    Text("Send a notification when a session ends")
+                }
+                .onChange(of: Defaults[.pomodoroNotifications]) { _, enabled in
+                    if enabled { pomodoro.requestNotificationPermission() }
+                }
+                if Defaults[.pomodoroNotifications] && pomodoro.notificationStatus == .denied {
+                    Button("Open Notification Settings") {
+                        pomodoro.openNotificationSettings()
+                    }
+                }
+            } header: {
+                HStack {
+                    Text("Feedback")
+                }
+            } footer: {
+                if Defaults[.pomodoroNotifications] && pomodoro.notificationStatus == .denied {
+                    Text("Notches is not allowed to post notifications. Enable it in System Settings, then reopen this window.")
+                        .foregroundStyle(.orange)
+                } else {
+                    Button("Clear focus history") {
+                        pomodoro.clearHistory()
+                    }
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .navigationTitle("Focus")
+        .onAppear { pomodoro.refreshNotificationStatus() }
+    }
+}
+
 struct Shelf: View {
-    
-    @Default(.shelfTapToOpen) var shelfTapToOpen: Bool
     @Default(.quickShareProvider) var quickShareProvider
     @Default(.expandedDragDetection) var expandedDragDetection: Bool
     @StateObject private var quickShareService = QuickShareService.shared
@@ -1739,6 +1824,18 @@ struct Shortcuts: View {
             }
             Section {
                 KeyboardShortcuts.Recorder("Toggle Notch Open:", name: .toggleNotchOpen)
+            }
+            Section {
+                KeyboardShortcuts.Recorder("Start / pause:", name: .pomodoroToggle)
+                KeyboardShortcuts.Recorder("Skip session:", name: .pomodoroSkip)
+                KeyboardShortcuts.Recorder("Reset session:", name: .pomodoroReset)
+            } header: {
+                Text("Pomodoro")
+            } footer: {
+                Text("Control the timer without leaving your current app. Defaults to ⇧⌘P, ⇧⌘→ and ⇧⌘←.")
+                .multilineTextAlignment(.trailing)
+                .foregroundStyle(.secondary)
+                .font(.caption)
             }
         }
         .accentColor(.effectiveAccent)

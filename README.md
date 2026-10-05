@@ -1,3 +1,19 @@
+---
+
+> **This repository is a fork, not the original.**
+>
+> This is **[Mlhassane/boring-notch-pomodoro](https://github.com/Mlhassane/boring-notch-pomodoro)**,
+> a fork of **[TheBoredTeam/boring.notch](https://github.com/TheBoredTeam/boring.notch)**
+> with a **Pomodoro timer** added — see [`POMODORO.md`](POMODORO.md) (in French) for
+> exactly what was added and why.
+>
+> All original work, artwork and code below belong to
+> [The Bored Team](https://github.com/TheBoredTeam). Licensed under the
+> [GNU General Public License v3.0](LICENSE) — the original licence is unchanged.
+> Please support them upstream if you like their work.
+
+---
+
 <h1 align="center">
   <br>
   <a href="http://theboring.name"><img src="https://framerusercontent.com/images/RFK4vs0kn8pRMuOO58JeyoemXA.png?scale-down-to=256" alt="Boring Notch" width="150"></a>

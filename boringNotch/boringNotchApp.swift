@@ -83,6 +83,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             screenUnlockedObserver = nil
         }
         MusicManager.shared.destroy()
+        PomodoroManager.shared.destroy()
         cleanupDragDetectors()
         cleanupWindows()
         XPCHelperClient.shared.stopMonitoringAccessibilityAuthorization()
@@ -281,6 +282,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
 
+        // No notification prompt at launch: an accessory app has no window to
+        // attach it to, and the activation-policy dance is too early to work.
+        // The request happens when the user enables the setting, or the first
+        // time a session ends.
+        PomodoroManager.shared.refreshNotificationStatus()
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(screenConfigurationDidChange),
@@ -362,6 +369,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     type: .music,
                     duration: 3.0
                 )
+            }
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .pomodoroToggle) {
+            Task { @MainActor in
+                PomodoroManager.shared.toggle()
+            }
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .pomodoroSkip) {
+            Task { @MainActor in
+                PomodoroManager.shared.skip()
+            }
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .pomodoroReset) {
+            Task { @MainActor in
+                PomodoroManager.shared.reset()
             }
         }
 
