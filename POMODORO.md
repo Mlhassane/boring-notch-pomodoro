@@ -44,11 +44,14 @@ screencapture -x -R 380,0,760,260 -t png /tmp/focus.png
 
 - **Dans l'encoche, panneau replié** : anneau + temps + compteur `n/4`, dès qu'une
   session est en cours ou en pause.
-  La branche Pomodoro est placée **après** `MusicLiveActivity()` dans le switch de
-  `ContentView` : lactivities musicale garde la priorité, le minuteur ne prend la
-  bande que lorsqu'elle est libre. L'encoche repliée ne fait qu'environ 200 pt de
-  large et l activities musicale en occupe déjà la quasi-totalité (pochette 20 pt +
-  rectangle noir 194 pt + visualiseur), donc les afficher côte à côte déborde.
+  **Musique et Pomodoro cohabitent** : l activities musicale garde la bande
+  (pochette à gauche, visualiseur à droite) et le minuteur se pose sur le vide noir
+  entre les deux, en overlay du rectangle de `MusicLiveActivity()`. L'encoche
+  repliée fait environ 200 pt de large, la pochette occupe 20 pt à gauche et le
+  visualiseur 20 pt à droite : il reste la place pour l'anneau et le temps.
+  L'overlay n'apparaît que quand le panneau est replié ; en developed, cette
+  largeur est déjà consommée par le titre et l'artiste.
+  Si la musique est inactive, la branche Pomodoro prend toute la bande.
 - **Onglet Focus** (2ᵉ onglet) : sélecteur de mode, anneau 25:00, stop / play /
   skip, points de session, minutes du jour, sessions du jour, série de jours,
   histogramme 7 jours, total, effacement de l'historique.

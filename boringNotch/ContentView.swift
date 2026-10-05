@@ -460,6 +460,18 @@ struct ContentView: View {
                         : vm.closedNotchSize.width
                             + -cornerRadiusInsets.closed.top
                 )
+                .overlay(alignment: .trailing) {
+                    // The closed notch is mostly empty black between the artwork
+                    // and the spectrum, so a running session rides along there
+                    // instead of displacing the music. Only while collapsed: the
+                    // expanded view already spends that width on title and artist.
+                    if !coordinator.expandingView.show,
+                       Defaults[.pomodoroShowInNotch],
+                       pomodoro.isRelevantToNotch {
+                        PomodoroLiveActivity()
+                            .padding(.trailing, vm.effectiveClosedNotchHeight)
+                    }
+                }
 
             HStack {
                 if useMusicVisualizer {
